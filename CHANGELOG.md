@@ -5,6 +5,14 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 
 ## Unreleased
 
-## [0.0.1] - 2015-12-28
+## [0.1.3] - 2015-12-28
+### Added
+- Requiring json globally
+
+## [0.1.2] - 2015-12-28
+### Added
+- Defaulting @json_config to empty hash
+
+## [0.1.1] - 2015-12-28
 ### Added
 - Initial release

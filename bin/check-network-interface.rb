@@ -123,7 +123,7 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
       @interfaces << interface
     end
 
-    @json_config = nil
+    @json_config = {}
     if File.exists?(config[:config_file])
       require 'json'
       @json_config = JSON.parse(File.read(config[:config_file]))

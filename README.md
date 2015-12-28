@@ -1,0 +1,49 @@
+# Sensu plugin for monitoring network interfaces
+
+A sensu plugin to efficiently monitor network interfaces on Linux allowing to track metrics like speed, duplex, operational status, link carrier etc.
+
+The plugin generates multiple OK/WARN/CRIT/UNKNOWN events via the sensu client socket (https://sensuapp.org/docs/latest/clients#client-socket-input) so that you
+do not miss state changes when monitoring multiple interfaces + metrics.
+
+## Usage
+
+The plugin accepts command line options to specify things like expected mtu, speed, duplex, operstate etc.
+
+```
+Usage: check-network-interface.rb (options)
+        --carrier <STATE>            Indicates the current physical link state of the interface (default: up)
+    -d, --duplex <STATE>             Check interface duplex settings (default: full)
+    -x <INTERFACES>                  Comma separated list of interfaces to ignore
+    -i <INTERFACES>                  Comma separated list of interfaces to check
+    -m, --mtu <MTU>                  Message Transfer Unit
+        --operstate <STATE>          Indicates the interface RFC2863 operational state (default: up)
+    -X <INTERFACES>                  Comma separated list of Interfaces to ignore (regex)
+    -I <INTERFACES>                  Comma separated list of interfaces to check (regex)
+    -s, --speed <SPEED>              Expected speed in Mb/s
+    -t, --txqueuelen <TXQUEUELEN>    Transmit Queue Length
+    -w, --warn                       Warn instead of throwing a critical failure
+```
+
+By default, command line option parameters are global to all interfaces. However, each interface can override the defaults in an optional JSON configuration file which must be placed
+in the same location as the plugin.
+
+JSON example:
+
+```
+{
+  "interfaces": {
+    "eth0": {
+      "operstate": "down",
+      "carrier": "down"
+      "duplex": "full",
+      "speed": 10000,
+      "mtu": 9000,
+      "txqueuelen": 10000
+    },
+    ...
+  }
+}
+```
+
+## Author
+Matteo Cerutti - <matteo.cerutti@hotmail.co.uk>

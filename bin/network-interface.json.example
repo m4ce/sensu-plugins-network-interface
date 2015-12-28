@@ -1,0 +1,26 @@
+{
+  "interfaces": {
+    "eth0": {
+      "operstate": "down",
+      "carrier": "down"
+    },
+    "eth1": {
+      "operstate": "down",
+      "carrier": "down"
+    },
+    "eth2": {
+      "operstate": "up",
+      "carrier": "up",
+      "speed": 10000,
+      "mtu": 9000,
+      "txqueuelen": 10000
+    },
+    "eth3": {
+      "operstate": "up",
+      "carrier": "up",
+      "speed": 10000,
+      "mtu": 9000,
+      "txqueuelen": 10000
+    }
+  }
+}

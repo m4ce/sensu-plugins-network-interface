@@ -7,6 +7,7 @@
 
 require 'sensu-plugin/check/cli'
 require 'socket'
+require 'json'
 
 class CheckNetworkInterface < Sensu::Plugin::Check::CLI
   option :interface,
@@ -125,7 +126,6 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
 
     @json_config = {}
     if File.exists?(config[:config_file])
-      require 'json'
       @json_config = JSON.parse(File.read(config[:config_file]))
     end
   end

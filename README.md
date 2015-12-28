@@ -12,9 +12,10 @@ The plugin accepts command line options to specify things like expected mtu, spe
 ```
 Usage: check-network-interface.rb (options)
         --carrier <STATE>            Indicates the current physical link state of the interface (default: up)
+    -c, --config <PATH>              Optional configuration file (default: ./network-interface.json)
     -d, --duplex <STATE>             Check interface duplex settings (default: full)
     -x <INTERFACES>                  Comma separated list of interfaces to ignore
-    -i <INTERFACES>                  Comma separated list of interfaces to check
+    -i <INTERFACES>                  Comma separated list of interfaces to check (default: ALL)
     -m, --mtu <MTU>                  Message Transfer Unit
         --operstate <STATE>          Indicates the interface RFC2863 operational state (default: up)
     -X <INTERFACES>                  Comma separated list of Interfaces to ignore (regex)
@@ -44,6 +45,8 @@ JSON example:
   }
 }
 ```
+
+Ideally, you would manage the configuration file via your favourite cfgmgmt tool (e.g. Puppet).
 
 ## Author
 Matteo Cerutti - <matteo.cerutti@hotmail.co.uk>

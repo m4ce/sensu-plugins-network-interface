@@ -33,6 +33,12 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
          :proc => proc { |a| a.split(',') },
          :default => []
 
+  option :config_file,
+         :description => "Optional configuration file (default: #{File.dirname(__FILE__)}/network-interface.json)",
+         :short => "-c <PATH>",
+         :long => "--config <PATH>",
+         :default => File.dirname(__FILE__) + "/network-interface.json"
+
   option :speed,
          :description => "Expected speed in Mb/s",
          :short => "-s <SPEED>",
@@ -118,10 +124,9 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
     end
 
     @json_config = nil
-    config = File.dirname(__FILE__) + "/network-interface.json"
-    if File.exists?(config)
+    if File.exists?(config[:config_file])
       require 'json'
-      @json_config = JSON.parse(File.read(config))
+      @json_config = JSON.parse(File.read(config[:config_file]))
     end
   end
 

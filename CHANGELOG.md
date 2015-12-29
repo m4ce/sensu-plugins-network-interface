@@ -5,6 +5,10 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 
 ## Unreleased
 
+## [0.1.7] - 2015-12-29
+### Added
+- Fixed wrong logic when populating interface_config from ifcfg files
+
 ## [0.1.6] - 2015-12-29
 ### Added
 - No longer send UNKNOWN events when metrics cannot be computed for specific interface (e.g. speed & bridge interfaces)

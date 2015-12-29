@@ -5,6 +5,10 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 
 ## Unreleased
 
+## [0.1.5] - 2015-12-29
+### Added
+- Fixed typo
+
 ## [0.1.4] - 2015-12-29
 ### Added
 - Added ifcfg-<interface> support

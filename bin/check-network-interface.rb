@@ -156,7 +156,7 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
   end
 
   def find_interfaces()
-    Dir["/sys/class/net/*"].map { |i| File.basename(i) }.reject { |i| i =~ /^lo/ }
+    Dir["/sys/class/net/*"].select { |i| File.symlink?(i) }.map { |i| File.basename(i) }.reject { |i| i =~ /^lo/ or i =~ /^dummy/ }
   end
 
   def get_info(interface)
@@ -165,20 +165,24 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
     # https://www.kernel.org/doc/Documentation/ABI/testing/sysfs-class-net
     ["tx_queue_len", "speed", "mtu", "duplex", "carrier", "operstate"].each do |metric|
       if File.exists?("/sys/class/net/#{interface}/#{metric}")
-        value = File.read("/sys/class/net/#{interface}/#{metric}").chomp
+        begin
+          value = File.read("/sys/class/net/#{interface}/#{metric}").chomp
 
-        case metric
-          when "speed", "mtu"
-            info[metric] = value.to_i
+          case metric
+            when "speed", "mtu"
+              info[metric] = value.to_i
 
-          when "tx_queue_len"
-            info['txqueuelen'] = value.to_i
+            when "tx_queue_len"
+              info['txqueuelen'] = value.to_i
 
-          when "carrier"
-            info[metric] = value.to_i > 0 ? "up" : "down"
+            when "carrier"
+              info[metric] = value.to_i > 0 ? "up" : "down"
 
-          else
-            info[metric] =  value
+            else
+              info[metric] =  value
+          end
+        rescue
+          info[metric] = nil
         end
       else
         info[metric] = nil
@@ -259,9 +263,9 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
               send_ok(check_name, "#{metric} #{interface}")
             end
           end
-        else
-          send_unknown(check_name, "Failed to look up #{metric} on #{interface}")
-          problems += 1
+        #else
+        #  send_unknown(check_name, "Failed to look up #{metric} on #{interface}")
+        #  problems += 1
         end
       end
     end

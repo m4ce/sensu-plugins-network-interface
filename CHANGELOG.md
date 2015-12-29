@@ -5,6 +5,10 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 
 ## Unreleased
 
+## [0.1.4] - 2015-12-29
+### Added
+- Added ifcfg-<interface> support
+
 ## [0.1.3] - 2015-12-28
 ### Added
 - Requiring json globally

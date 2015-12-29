@@ -16,7 +16,7 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
          :proc => proc { |a| a.split(',') },
          :default => []
 
-  option :rinterface,
+  option :interface_regex,
          :description => "Comma separated list of interfaces to check (regex)",
          :short => "-I <INTERFACES>",
          :proc => proc { |a| a.split(',') },
@@ -28,7 +28,7 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
          :proc => proc { |a| a.split(',') },
          :default => []
 
-  option :rignore_interface,
+  option :ignore_interface_regex,
          :description => "Comma separated list of Interfaces to ignore (regex)",
          :short => "-X <INTERFACES>",
          :proc => proc { |a| a.split(',') },
@@ -95,9 +95,9 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
         next if config[:ignore_interface].include?(interface)
       end
 
-      if config[:rignore_interface].size > 0
+      if config[:ignore_interface_regex].size > 0
         b = false
-        config[:rignore_interface].each do |ignore_interface|
+        config[:ignore_interface_regex].each do |ignore_interface|
           if interface =~ Regexp.new(ignore_interface)
             b = true
             break
@@ -110,10 +110,10 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
         next unless config[:interface].include?(interface)
       end
 
-      if config[:rinterface].size > 0
+      if config[:interface_regex].size > 0
         b = true
-        config[:rinterface].each do |rinterface|
-          if interface =~ Regexp.new(rinterface)
+        config[:interface_regex].each do |interface_regex|
+          if interface =~ Regexp.new(interface_regex)
             b = false
             break
           end
@@ -192,11 +192,45 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
     problems = 0
 
     @interfaces.each do |interface|
+      ifcfg = nil
+
+      # RHEL
+      if File.exists?("/etc/sysconfig/network-scripts/ifcfg-#{interface}")
+        ifcfg = "/etc/sysconfig/network-scripts/ifcfg-#{interface}"
+      # SuSE
+      elsif File.exists?("/etc/sysconfig/network/ifcfg-#{interface}")
+        ifcfg = "/etc/sysconfig/network/ifcfg-#{interface}"
+      end
+
+      interface_config = {}
+      if ifcfg
+        File.read(ifcfg).split("\n").reject { |i| i =~ /^#/ or i =~ /^\s*$/ }.each do |i|
+          k, v = i.split('=')
+          case k
+            when 'mtu', 'txqueuelen'
+              v = v.to_i
+          end
+          interface_config[k] = v
+        end
+      end
+
       get_info(interface).each do |metric, value|
         check_name = "network-interface-#{interface}-#{metric}"
 
         if value != nil
-          if @json_config.has_key?('interfaces') and @json_config['interfaces'].has_key?(interface) and @json_config['interfaces'][interface].has_key?(metric)
+          if interface_config.has_key(metric)
+            if value != interface_config[metric]
+              msg = "Expected #{metric} #{interface_config[metric]} but found #{value} on #{interface}"
+              if config[:warn]
+                send_warning(check_name, msg)
+              else
+                send_critical(check_name, msg)
+              end
+              problems += 1
+            else
+              send_ok(check_name, "Found expected #{metric} (#{interface_config[metric]}) on #{interface}")
+            end
+          elsif @json_config.has_key?('interfaces') and @json_config['interfaces'].has_key?(interface) and @json_config['interfaces'][interface].has_key?(metric)
             if value != @json_config['interfaces'][interface][metric]
               msg = "Expected #{metric} #{@json_config['interfaces'][interface][metric]} but found #{value} on #{interface}"
               if config[:warn]

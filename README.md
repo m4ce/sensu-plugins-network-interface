@@ -14,12 +14,15 @@ Usage: check-network-interface.rb (options)
         --carrier <STATE>            Indicates the current physical link state of the interface (default: up)
     -c, --config <PATH>              Optional configuration file (default: ./network-interface.json)
     -d, --duplex <STATE>             Check interface duplex settings (default: full)
-    -x <INTERFACES>                  Comma separated list of interfaces to ignore
-    -i <INTERFACES>                  Comma separated list of interfaces to check (default: ALL)
+    -x <INTERFACES>,                 Comma separated list of interfaces to ignore
+        --ignore-interface
+    -X <INTERFACES>,                 Comma separated list of Interfaces to ignore (regex)
+        --ignore-interface-regex
+    -i, --interface <INTERFACES>     Comma separated list of interfaces to check (default: ALL)
+    -I <INTERFACES>,                 Comma separated list of interfaces to check (regex)
+        --interface-regex
     -m, --mtu <MTU>                  Message Transfer Unit
         --operstate <STATE>          Indicates the interface RFC2863 operational state (default: up)
-    -X <INTERFACES>                  Comma separated list of Interfaces to ignore (regex)
-    -I <INTERFACES>                  Comma separated list of interfaces to check (regex)
     -s, --speed <SPEED>              Expected speed in Mb/s
     -t, --txqueuelen <TXQUEUELEN>    Transmit Queue Length
     -w, --warn                       Warn instead of throwing a critical failure

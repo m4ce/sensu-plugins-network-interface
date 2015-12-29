@@ -25,8 +25,8 @@ Usage: check-network-interface.rb (options)
     -w, --warn                       Warn instead of throwing a critical failure
 ```
 
-By default, command line option parameters are global to all interfaces. However, each interface can override the defaults in an optional JSON configuration file which must be placed
-in the same location as the plugin.
+By default, command line option parameters are global to all interfaces. However, each interface can override the defaults either in their ifcfg configuration files (e.g. MTU) or
+in an optional JSON configuration file which must be placed in the same location as the plugin.
 
 JSON example:
 

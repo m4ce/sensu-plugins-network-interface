@@ -218,7 +218,7 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
         check_name = "network-interface-#{interface}-#{metric}"
 
         if value != nil
-          if interface_config.has_key(metric)
+          if interface_config.has_key?(metric)
             if value != interface_config[metric]
               msg = "Expected #{metric} #{interface_config[metric]} but found #{value} on #{interface}"
               if config[:warn]

@@ -13,24 +13,28 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
   option :interface,
          :description => "Comma separated list of interfaces to check (default: ALL)",
          :short => "-i <INTERFACES>",
+         :long => "--interface <INTERFACES>",
          :proc => proc { |a| a.split(',') },
          :default => []
 
   option :interface_regex,
          :description => "Comma separated list of interfaces to check (regex)",
          :short => "-I <INTERFACES>",
+         :long => "--interface-regex <INTERFACES>",
          :proc => proc { |a| a.split(',') },
          :default => []
 
   option :ignore_interface,
          :description => "Comma separated list of interfaces to ignore",
          :short => "-x <INTERFACES>",
+         :long => "--ignore-interface <INTERFACES>",
          :proc => proc { |a| a.split(',') },
          :default => []
 
   option :ignore_interface_regex,
          :description => "Comma separated list of Interfaces to ignore (regex)",
          :short => "-X <INTERFACES>",
+         :long => "--ignore-interface-regex <INTERFACES>",
          :proc => proc { |a| a.split(',') },
          :default => []
 

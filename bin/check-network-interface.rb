@@ -210,11 +210,16 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
       if ifcfg
         File.read(ifcfg).split("\n").reject { |i| i =~ /^#/ or i =~ /^\s*$/ }.each do |i|
           k, v = i.split('=')
-          case k
+
+          metric = k.downcase
+          case metric
             when 'mtu', 'txqueuelen'
-              v = v.to_i
+              value = v.to_i
+
+            else
+              value = v
           end
-          interface_config[k] = v
+          interface_config[metric] = value
         end
       end
 
@@ -260,7 +265,7 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
                 send_ok(check_name, "Found expected #{metric} (#{config[metric.to_sym]}) on #{interface}")
               end
             else
-              send_ok(check_name, "#{metric} #{interface}")
+              send_ok(check_name, "Not monitoring #{metric} on #{interface}")
             end
           end
         #else

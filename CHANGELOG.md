@@ -5,6 +5,10 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 
 ## Unreleased
 
+## [0.1.8] - 2015-12-29
+### Added
+- Adding long options
+
 ## [0.1.7] - 2015-12-29
 ### Added
 - Fixed wrong logic when populating interface_config from ifcfg files

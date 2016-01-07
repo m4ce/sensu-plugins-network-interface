@@ -17,24 +17,10 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
          :proc => proc { |a| a.split(',') },
          :default => []
 
-  option :interface_regex,
-         :description => "Comma separated list of interfaces to check (regex)",
-         :short => "-I <INTERFACES>",
-         :long => "--interface-regex <INTERFACES>",
-         :proc => proc { |a| a.split(',') },
-         :default => []
-
   option :ignore_interface,
          :description => "Comma separated list of interfaces to ignore",
          :short => "-x <INTERFACES>",
          :long => "--ignore-interface <INTERFACES>",
-         :proc => proc { |a| a.split(',') },
-         :default => []
-
-  option :ignore_interface_regex,
-         :description => "Comma separated list of Interfaces to ignore (regex)",
-         :short => "-X <INTERFACES>",
-         :long => "--ignore-interface-regex <INTERFACES>",
          :proc => proc { |a| a.split(',') },
          :default => []
 
@@ -88,21 +74,24 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
          :description => "Warn instead of throwing a critical failure",
          :short => "-w",
          :long => "--warn",
-         :boolean => false
+         :boolean => true,
+         :default => false
+
+  option :dryrun,
+         :description => "Do not send events to sensu client socket",
+         :long => "--dryrun",
+         :boolean => true,
+         :default => false
 
   def initialize()
     super
 
     @interfaces = []
-    find_interfaces().each do |interface|
+    find_interfaces().each do |intf|
       if config[:ignore_interface].size > 0
-        next if config[:ignore_interface].include?(interface)
-      end
-
-      if config[:ignore_interface_regex].size > 0
         b = false
-        config[:ignore_interface_regex].each do |ignore_interface|
-          if interface =~ Regexp.new(ignore_interface)
+        config[:ignore_interface].each do |ignore_interface|
+          if intf.match(ignore_interface)
             b = true
             break
           end
@@ -111,13 +100,9 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
       end
 
       if config[:interface].size > 0
-        next unless config[:interface].include?(interface)
-      end
-
-      if config[:interface_regex].size > 0
         b = true
-        config[:interface_regex].each do |interface_regex|
-          if interface =~ Regexp.new(interface_regex)
+        config[:interface].each do |interface|
+          if intf.match(interface)
             b = false
             break
           end
@@ -125,18 +110,31 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
         next if b
       end
 
-      @interfaces << interface
+      @interfaces << intf
     end
 
     @json_config = {}
     if File.exists?(config[:config_file])
       @json_config = JSON.parse(File.read(config[:config_file]))
     end
+
+    @ifcfg_dir = nil
+    # RHEL
+    if File.directory?("/etc/sysconfig/network-scripts")
+      @ifcfg_dir = "/etc/sysconfig/network-scripts"
+    # SuSE
+    elsif File.directory?("/etc/sysconfig/network")
+      @ifcfg_dir = "/etc/sysconfig/network"
+    end
   end
 
   def send_client_socket(data)
-    sock = UDPSocket.new
-    sock.send(data + "\n", 0, "127.0.0.1", 3030)
+    if config[:dryrun]
+      puts data.inspect
+    else
+      sock = UDPSocket.new
+      sock.send(data + "\n", 0, "127.0.0.1", 3030)
+    end
   end
 
   def send_ok(check_name, msg)
@@ -160,7 +158,15 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
   end
 
   def find_interfaces()
-    Dir["/sys/class/net/*"].select { |i| File.symlink?(i) }.map { |i| File.basename(i) }.reject { |i| i =~ /^lo/ or i =~ /^dummy/ }
+    interfaces = Dir["/sys/class/net/*"].select { |i| File.symlink?(i) }.map { |i| File.basename(i) }.reject { |i| i =~ /^lo/ or i =~ /^dummy/ }
+
+    if @ifcfg_dir
+      Dir[@ifcfg_dir + "/ifcfg-*"].map { |i| File.basename(i) }.reject { |i| i =~ /-lo.*$/ or i =~ /^-range.*$/ }.each do |cfg|
+        content = File.read(@ifcfg_dir + "/" + cfg)
+        device = content[/^DEVICE=(.*)/, 1]
+        interfaces << device unless interfaces.include?(device)
+      end
+    end
   end
 
   def get_info(interface)
@@ -202,12 +208,10 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
     @interfaces.each do |interface|
       ifcfg = nil
 
-      # RHEL
-      if File.exists?("/etc/sysconfig/network-scripts/ifcfg-#{interface}")
-        ifcfg = "/etc/sysconfig/network-scripts/ifcfg-#{interface}"
-      # SuSE
-      elsif File.exists?("/etc/sysconfig/network/ifcfg-#{interface}")
-        ifcfg = "/etc/sysconfig/network/ifcfg-#{interface}"
+      if @ifcfg_dir
+        if File.exists?("#{@ifcfg_dir}/ifcfg-#{interface}")
+          ifcfg = "#{@ifcfg_dir}/ifcfg-#{interface}"
+        end
       end
 
       interface_config = {}

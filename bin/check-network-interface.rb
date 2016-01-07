@@ -167,6 +167,8 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
         interfaces << device unless interfaces.include?(device)
       end
     end
+
+    interfaces
   end
 
   def get_info(interface)

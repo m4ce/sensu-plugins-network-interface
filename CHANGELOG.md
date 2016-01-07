@@ -5,6 +5,14 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 
 ## Unreleased
 
+## [0.1.10] - 2016-01-07
+### Added
+- Fixed find_interfaces() return parameter
+
+## [0.1.9] - 2016-01-07
+### Added
+- Also monitor interfaces that are configured via the ifcfg config files.
+
 ## [0.1.8] - 2015-12-29
 ### Added
 - Adding long options

@@ -158,10 +158,10 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
   end
 
   def find_interfaces()
-    interfaces = Dir["/sys/class/net/*"].select { |i| File.symlink?(i) }.map { |i| File.basename(i) }.reject { |i| i =~ /^lo/ or i =~ /^dummy/ }
+    interfaces = Dir["/sys/class/net/*"].select { |i| File.symlink?(i) }.map { |i| File.basename(i) }.reject { |i| i =~ /^dummy/ }
 
     if @ifcfg_dir
-      Dir[@ifcfg_dir + "/ifcfg-*"].map { |i| File.basename(i) }.reject { |i| i =~ /-lo.*$/ or i =~ /^-range.*$/ }.each do |cfg|
+      Dir[@ifcfg_dir + "/ifcfg-*"].map { |i| File.basename(i) }.reject { |i| i =~ /^-range.*$/ }.each do |cfg|
         content = File.read(@ifcfg_dir + "/" + cfg)
         device = content[/^DEVICE=(.*)/, 1]
         interfaces << device unless interfaces.include?(device)
@@ -231,6 +231,13 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
           end
           interface_config[metric] = value
         end
+      end
+
+      # some interfaces, e.g. loopback devices, always use specific settings
+      if interface =~ /^lo\d+/
+        interface_config['mtu'] = 65536
+        interface_config['operstate'] = "unknown"
+        interface_config['txqueuelen'] = 0
       end
 
       get_info(interface).each do |metric, value|

@@ -5,6 +5,10 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 
 ## Unreleased
 
+## [0.1.11] - 2016-01-08
+### Added
+- No longer excluding loopback devices from monitoring
+
 ## [0.1.10] - 2016-01-07
 ### Added
 - Fixed find_interfaces() return parameter

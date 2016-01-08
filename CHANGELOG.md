@@ -5,6 +5,10 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 
 ## Unreleased
 
+## [0.1.14] - 2016-01-08
+### Added
+- Fixed regex when matching loopback devices
+
 ## [0.1.13] - 2016-01-08
 ### Added
 - Fixed default configuration for loopback devices

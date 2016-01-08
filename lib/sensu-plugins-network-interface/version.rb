@@ -2,7 +2,7 @@ module SensuPluginsNetworkInterface
   module Version
     MAJOR = 0
     MINOR = 1
-    PATCH = 12
+    PATCH = 13
 
     VER_STRING = [MAJOR, MINOR, PATCH].compact.join('.')
   end

@@ -120,7 +120,7 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
 
     @interfaces.each do |interface|
       # some interfaces, e.g. loopback devices, always use specific settings
-      if interface =~ /^lo\d+?/
+      if interface =~ /^lo(\d+)?/
         @json_config['interfaces'] ||= {}
         @json_config['interfaces'][interface] ||= {}
         @json_config['interfaces'][interface]['mtu'] = 65536 unless @json_config['interfaces'][interface].has_key?('mtu')

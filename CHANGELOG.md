@@ -3,7 +3,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachangelog.com/)
 
-## Unreleased
+## [0.1.15] - 2016-01-14
+### Added
+- Added --handlers command line option
 
 ## [0.1.14] - 2016-01-08
 ### Added
@@ -57,3 +59,6 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 ## [0.1.1] - 2015-12-28
 ### Added
 - Initial release
+
+## Unreleased
+

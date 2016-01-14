@@ -18,12 +18,15 @@ Usage: check-network-interface.rb (options)
     -x <INTERFACES>,                 Comma separated list of interfaces to ignore
         --ignore-interface
     -i, --interface <INTERFACES>     Comma separated list of interfaces to check (default: ALL)
+        --handlers <HANDLERS>        Comma separated list of handlers
     -m, --mtu <MTU>                  Message Transfer Unit
         --operstate <STATE>          Indicates the interface RFC2863 operational state (default: up)
     -s, --speed <SPEED>              Expected speed in Mb/s
     -t, --txqueuelen <TXQUEUELEN>    Transmit Queue Length
     -w, --warn                       Warn instead of throwing a critical failure
 ```
+
+Use the --handlers command line option to specify which handlers you want to use for the generated events.
 
 The --interface and --ignore-interface parameters can also accept regular expressions.
 

@@ -174,25 +174,7 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
     send_client_socket(event.to_json)
   end
 
-  def find_interfaces()
-    interfaces = Dir["/sys/class/net/*"].select { |i| File.symlink?(i) }.map { |i| File.basename(i) }.reject { |i| i =~ /^dummy/ }
-
-    if @ifcfg_dir
-    # Remove interfaces from Array interfaces where ONBOOT = no
-      Dir[@ifcfg_dir + "/ifcfg-*"].map { |i| File.basename(i) }.reject { |i| i =~ /^-range.*$/ }.each do |cfg|
-        content = File.read(@ifcfg_dir + "/" + cfg)
-    nicenable = content[/^ONBOOT=(.*)/,1]
-    nicenable.gsub! /"/, '|'
-    if nicenable == "no"
-            device = content[/^DEVICE=(.*)/, 1]
-            device.gsub! /"/, '|'
-    end
-        interfaces.delete(device)
-      end
-    end
-
-    interfaces
-  end
+find_interfaces
 
   def get_info(interface)
     info = {}

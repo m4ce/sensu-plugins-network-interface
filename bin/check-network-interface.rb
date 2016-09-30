@@ -92,6 +92,15 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
   def initialize()
     super
 
+    @ifcfg_dir = nil
+    # RHEL
+    if File.directory?("/etc/sysconfig/network-scripts")
+      @ifcfg_dir = "/etc/sysconfig/network-scripts"
+    # SuSE
+    elsif File.directory?("/etc/sysconfig/network")
+      @ifcfg_dir = "/etc/sysconfig/network"
+    end
+
     @interfaces = []
     find_interfaces().each do |intf|
       if config[:ignore_interface].size > 0
@@ -135,14 +144,6 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
       end
     end
 
-    @ifcfg_dir = nil
-    # RHEL
-    if File.directory?("/etc/sysconfig/network-scripts")
-      @ifcfg_dir = "/etc/sysconfig/network-scripts"
-    # SuSE
-    elsif File.directory?("/etc/sysconfig/network")
-      @ifcfg_dir = "/etc/sysconfig/network"
-    end
   end
 
   def send_client_socket(data)
@@ -178,13 +179,14 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
     interfaces = Dir["/sys/class/net/*"].select { |i| File.symlink?(i) }.map { |i| File.basename(i) }.reject { |i| i =~ /^dummy/ }
 
     if @ifcfg_dir
+    # Remove interfaces from Array interfaces where ONBOOT = no
       Dir[@ifcfg_dir + "/ifcfg-*"].map { |i| File.basename(i) }.reject { |i| i =~ /^-range.*$/ }.each do |cfg|
         content = File.read(@ifcfg_dir + "/" + cfg)
-        device = content[/^DEVICE=(.*)/, 1]
-        interfaces << device unless interfaces.include?(device)
-      end
+            device = content[/^DEVICE=["']?([\w|\d]+)["']?/, 1]
+            onboot = content[/^ONBOOT=["']?([\w|\d]+)["']?/, 1].downcase == 'yes' ? true : false
+            interfaces.delete(device) unless onboot == true
+        end
     end
-
     interfaces
   end
 

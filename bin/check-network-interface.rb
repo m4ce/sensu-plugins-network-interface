@@ -184,7 +184,10 @@ class CheckNetworkInterface < Sensu::Plugin::Check::CLI
         content = File.read(@ifcfg_dir + "/" + cfg)
             device = content[/^DEVICE=["']?([\w|\d]+)["']?/, 1]
             onboot = content[/^ONBOOT=["']?([\w|\d]+)["']?/, 1].downcase == 'yes' ? true : false
-            interfaces.delete(device) unless onboot == true
+        if content["SLAVE"]
+            slave = content[/^SLAVE=["']?([\w|\d]+)["']?/, 1].downcase == 'yes' ? true : false
+        end
+            interfaces.delete(device) unless onboot == true and slave == false
         end
     end
     interfaces
